@@ -25,69 +25,49 @@ def main():
         com1.enable()
         print("Abriu a comunicação")
 
+        head_inicio = bytes.fromhex("00 00 00 00"),bytes.fromhex("00 00 BB 00"),bytes.fromhex("BB 00 00 00")
+        eop_inicio = bytes.fromhex("00 00 BB")
+        handshake = head_inicio + eop_inicio
 
-        # Sacrifício
+
+        # Byte de inicio
         time.sleep(.2)
-        com1.sendData(b'\x00')
-        time.sleep(1)
+        com1.sendData(handshake)
+        time.sleep(2)
 
-        tam, txBuffer, n_sorteado = sorteiaComando() 
-        print("O array de bytes len de {}" .format(txBuffer))
+        # Recebendo o Byte de inicio
+        print("esperando 1 byte de resposta")
+        tamanho, nRx = com1.getData(1)
 
-
+        com1.rx.clearBuffer()
+        time.sleep(.1)
         
-        com1.sendData(np.asarray(comeco))  
-        for i in range(len(txBuffer)):
-            # com1.sendData(np.asarray(tam[i]))
-            # time.sleep(0.5)
-            # print(tam[i])
-            # time.sleep(0.1)
-            com1.sendData(np.asarray(txBuffer[i]))
-            time.sleep(1)
-            #print(txBuffer[i])
-        com1.sendData(np.asarray(final))
-        #time.sleep(1)
-        print("enviou {}".format(n_sorteado))
-        #print('np.asarray(txBuffer)\n\n\n{}\n\n\n'.format(np.asarray(txBuffer)))
-
-
-        # ERROS
-        flagTimeOut = True
+        #“Servidor inativo. Tentar novamente? S/N”
         timeout = time.time() + 5
-        while time.time()<timeout:
-            # print(timeout-time.time())
-            if com1.rx.getBufferLen()>0:
-                rxBuffer, _ = com1.getData(1)
-                esperado = int.from_bytes(rxBuffer, byteorder='big')
+        #time.sleep(6)
+        if len(tamanho) != 0 and time.time()<timeout:
+            print('a')
+        else:
+            questao = input(str("Servidor inativo. Tentar novamente? S/N : " ))
+            if questao == "N":
+                # Encerra comunicação
+                print("-------------------------")
+                print("Comunicação encerrada")
+                print("-------------------------")
+                com1.disable()
+            else:
+                # Byte de inicio novamente
+                time.sleep(.2)
+                com1.sendData(b'\x00')
+                time.sleep(1)
 
-                if esperado == n_sorteado:
-                    print("recebeu {}, acabou a transmissão".format(esperado))
-                    flagTimeOut = False
-                    break
-                else:
-                    if esperado != n_sorteado:
-                        print("ERRO: NAO RECEBEU O QUE ESPERAVA")
-                        print("esperava {} e recebeu {}" .format(n_sorteado, esperado))
-                        flagTimeOut = False
-
-        if flagTimeOut:
-            print("ERRO: PASSOU 5 SEGUNDO")
-
-
-
-
-
-
-        # print("\n\n\n\n\n\n\nRECEBA tx:\n{}\n\nrx:\n{}\n\n" .format(txBuffer,rxBuffer))
-
-        #print("recebeu {} bytes" .format(len(rxBuffer)))
         
         
-        # Encerra comunicação
-        print("-------------------------")
-        print("Comunicação encerrada")
-        print("-------------------------")
-        com1.disable()
+        # # Encerra comunicação
+        # print("-------------------------")
+        # print("Comunicação encerrada")
+        # print("-------------------------")
+        # com1.disable()
         
     except Exception as erro:
         print("ops! :-\\")

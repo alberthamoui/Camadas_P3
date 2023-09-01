@@ -17,12 +17,22 @@ def main():
         com1.enable()
         print("Abriu a comunicação")
         
-        # Sacrificio
-        print("esperando 1 byte de sacrifício")
+        # Recebendo o Byte de inicio
+        print("esperando 1 byte de inicio")
         tamanho, nRx = com1.getData(1)
 
         com1.rx.clearBuffer()
         time.sleep(.1)
+
+        head_inicio = bytes.fromhex("00 00 00 00"),bytes.fromhex("00 00 BB 00"),bytes.fromhex("BB 00 00 00")
+        eop_inicio = bytes.fromhex("00 00 BB")
+        handshake = head_inicio + eop_inicio
+
+        #Enviando byte de recebimento
+        #time.sleep(6)
+        #Esse time.sleep(6) é para fazer o input perguntando c vai querer enviar de novo
+        com1.sendData(handshake)
+        time.sleep(1)
 
         contador = 0
         bandeira = True
