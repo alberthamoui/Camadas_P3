@@ -2,7 +2,10 @@ from enlace import *
 import time
 import numpy as np
 
+# serialName = "COM3"
 serialName = "COM7"
+# serialName = "COM6"
+
 recebidos = []
 comeco = b'\x0a'
 final = b'\x0f'
@@ -57,6 +60,17 @@ def main():
         # time.sleep(6)
         com1.sendData(contadorBytes)
         print("enviou")
+
+
+
+
+
+
+
+
+
+
+
 
         # Encerra comunicação
         print("-------------------------")
