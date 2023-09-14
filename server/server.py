@@ -3,8 +3,8 @@ import time
 import numpy as np
 
 # serialName = "COM3"
-serialName = "COM7"
-# serialName = "COM6"
+# serialName = "COM7"
+serialName = "COM6"
 
 recebidos = []
 comeco = b'\x0a'
@@ -27,15 +27,14 @@ def main():
         com1.rx.clearBuffer()
         time.sleep(.1)
 
-        head_inicio = bytes.fromhex("00 00 00 00"),bytes.fromhex("00 00 BB 00"),bytes.fromhex("BB 00 00 00")
-        eop_inicio = bytes.fromhex("00 00 BB")
+        head_inicio = b'\x00\x00\x00\x00' + b'\x00\x00\xBB\x00' + b'\xBB\x00\x00\x00'
+        eop_inicio = b'\x00\x00\xBB'
         handshake = head_inicio + eop_inicio
 
-        #Enviando byte de recebimento
-        #time.sleep(6)
-        #Esse time.sleep(6) é para fazer o input perguntando c vai querer enviar de novo
+        # Byte de inicio
+        time.sleep(0.2)
         com1.sendData(handshake)
-        time.sleep(1)
+        time.sleep(2)
 
         contador = 0
         bandeira = True
