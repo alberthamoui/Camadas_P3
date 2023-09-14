@@ -4,7 +4,6 @@ import time
 import numpy as np
 import random
 import binascii
-from utils import *
 
 
 
@@ -29,8 +28,8 @@ from utils import *
 #coloquei xfa como byte de espaco ja que o server vai receber tudo junto, n eh otimizado mas funciona
 #ira ter byte de comeco e byte de final, pro server reconhecer (esta certo)
 
-# serialName = "COM3"
-serialName = "COM7"
+serialName = "COM4"
+# serialName = "COM7"
 # serialName = "COM6"
 
 
@@ -48,9 +47,33 @@ def main():
 
 
         # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-        head_inicio = bytes.fromhex("00 00 00 00"),bytes.fromhex("00 00 BB 00"),bytes.fromhex("BB 00 00 00")
-        eop_inicio = bytes.fromhex("00 00 BB")
+        # head_inicio = bytes.fromhex("00 00 00 00"),bytes.fromhex("00 00 BB 00"),bytes.fromhex("BB 00 00 00")
+        # eop_inicio = bytes.fromhex("00 00 BB")
+        # handshake = head_inicio + eop_inicio
+
+        # # Byte de inicio
+        # time.sleep(.2)
+        # com1.sendData(bytes.fromhex(handshake))
+        # time.sleep(2)
+
+        head_inicio = b'\x00\x00\x00\x00' + b'\x00\x00\xBB\x00' + b'\xBB\x00\x00\x00'
+        eop_inicio = b'\x00\x00\xBB'
         handshake = head_inicio + eop_inicio
+
+        # Byte de inicio
+        time.sleep(0.2)
+        com1.sendData(handshake)
+        time.sleep(2)
+
+        # Recebendo o Byte de inicio
+        print("esperando 1 byte de resposta")
+        tamanho, nRx = com1.getData(1)
+
+        com1.rx.clearBuffer()
+        time.sleep(.1)
+
+
+
         img = "./imgs/img.png"
         txBuffer = open(img, 'rb').read()
         pacotes = None # O QUE EH ISSO??
@@ -65,6 +88,7 @@ def main():
 
 
         while ESTADO == hs:
+            timeout = time.time() + 5
             if tamanho != tamPacotesBytes:
                 quest = input(str("Servidor inativo. Tentar novamente? s/n : "))
                 if quest == 's':
@@ -76,7 +100,7 @@ def main():
                     print("Comunicação encerrada")
                     com1.disable()
 
-            elif tamanho == tamPacotesBytes:
+            elif tamanho == tamPacotesBytes and time.time()<timeout:
                 print("Tamanho do arquivo recebido com sucesso")
                 ESTADO = envio
                 break
