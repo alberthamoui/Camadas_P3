@@ -39,24 +39,31 @@ def main():
         time.sleep(2)
 
         # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+        # MAIN
         payloads = []
         bandeira = True
         cont = 0
         while bandeira:
             bufferLen = com1.rx.getBufferLen()
             numero, _ = com1.getData(bufferLen)
-            if len(numero)!=0:
-                cont +=1
-            header = numero[0:12]
-            payload = numero[13:-4]
-            eop = numero[-3:]
-            com1.rx.clearBuffer()
-            time.sleep(0.1)
-            if numero != b'':
-                payloads.append(payload)
-            if header[5:8] == b'\xAA\xAA\xAA\xAA' or cont==16:
+            if numero != b'\x0f':
+                if numero != b'':
+                    if len(numero)!=0:
+                        cont +=1
+                    payload = numero
+                    com1.rx.clearBuffer()
+                    time.sleep(0.1)
+                    # print(cont)
+                    if numero != b'':
+                        payloads.append(payload)
+                    if cont==22:
+                        print("ACABOU PORRA")
+            else:    
+                print("AIN ZE DA MANGA")
                 bandeira = False
+
+
+
         for i in payloads:
             if i == b'':
                 payloads.remove(i)
@@ -64,7 +71,7 @@ def main():
         print(len(payloads))
 
         # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+        # IMAGEM
         print(1)
         image_data = b''.join(payloads)
         print(2)
@@ -75,12 +82,7 @@ def main():
         image.save('final.jpeg')  # Save the image to a file
         print(5)
 
-
-
-
-
-
-
+        # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
         # Encerra comunicação
         print("-------------------------")
         print("Comunicação encerrada")
